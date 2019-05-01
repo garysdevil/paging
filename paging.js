@@ -18,7 +18,7 @@ const _Pagination = (allData, column, config) => {
     const configG = config || {
         add: true, update: true, delete: true, search: true,
     };
-    const updateButtomElement = configG.update ? ' <td><button>update</button></td>' : '';
+    const updateButtomElement = configG.update ? ' <td><button> update</button></td>' : '';
     const deleteCheckBox = configG.delete ? '<td><input type="checkbox"/></td>' : '';
 
     const getTheadElement = () => {
@@ -65,7 +65,7 @@ const _Pagination = (allData, column, config) => {
         <input type="number" min="1" step="1" max="${totalPage}" id="click-page-jump-value" value=${current + 1}>页
             <button id="click-page-jump">Go</button>
         `;
-        pageButtomElement += '<button id=click-page-first">first</button>'; // 第一页
+        pageButtomElement += '<button id="click-page-first">first</button>'; // 第一页
         pageButtomElement += '<button id="click-page-previous">previous</button>'; // 上一页
         pageButtomElement += '<button id="click-page-next">next</button>'; // 下一页
         pageButtomElement += '<button id="click-page-last">end</button>'; // 尾页
@@ -123,7 +123,7 @@ const _Pagination = (allData, column, config) => {
             showData(start, end);
         }
     };
-    // 搜索 consiction = {a:'1'}
+    // 搜索
     const resetFilteredData = data => {
         filteredData = data;
         totalData = filteredData.length; // 数据总量
@@ -157,17 +157,12 @@ const _Pagination = (allData, column, config) => {
             if (e.target.id.includes('data-item-')) {
                 const page = e.target.id.substr(-1, 1);
                 jump(page);
-            } else if (e.target.id.includes('click-search-')) {
-                search({ a: 'a1' });
             }
         }
         }
     });
 
     const api = {
-        filteredData,
-        dataNumPerPage,
-
         firstPage,
         lastPage,
         nextPage,
