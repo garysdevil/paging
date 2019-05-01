@@ -1,0 +1,28 @@
+{
+  "name": "paging",
+  "version": "1.0.0",
+  "description": "",
+  "main": "paging.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/garysdevil/paging.git"
+  },
+  "keywords": [
+    "pagination"
+  ],
+  "author": "gary",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/garysdevil/paging/issues"
+  },
+  "homepage": "https://github.com/garysdevil/paging#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^5.15.1",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.16.0"
+  }
+}

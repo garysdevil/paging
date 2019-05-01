@@ -1,0 +1,29 @@
+{
+    "extends": "airbnb-base",
+    "rules": {
+      "no-console": "off",
+      "indent": [
+        "warn",
+        4
+      ],
+      "import/no-extraneous-dependencies": false,
+      "import/no-dynamic-require": false,
+      "global-require": "off",
+      "no-param-reassign": "warn",
+      "linebreak-style": [
+        0,
+        "error",
+        "windows"
+      ],
+      "no-unused-expressions": [2, {
+        "allowTernary": true,
+        "allowShortCircuit": true
+      }],
+      "arrow-parens": [2, "as-needed"],
+      "no-underscore-dangle":"off"
+    },
+    "env": {
+      "browser": true,
+      "node": true
+    }
+  }

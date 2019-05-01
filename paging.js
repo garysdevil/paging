@@ -1,109 +1,178 @@
-const $ = selector => {
-    if (selector.indexOf('#') === 0) {
-        return document.querySelector(selector);
-    }
-    return document.querySelectorAll(selector);
-};
-const length = 3; // 每页的数据量
-let current = 0;
-/**
- * @param Array
- * data = [
- *      {'a':'a1','b':'b1'},
- *      {'a':'a2','b':'b2'}
- * ]
- * 
- */
-data = [
-    { a: 'a1', b: 'b1' },
-    { a: 'a2', b: 'b2' },
-    { a: 'a3', b: 'b3' },
-    { a: 'a4', b: 'b4' },
-    { a: 'a5', b: 'b5' },
-    { a: 'a6', b: 'b6' },
-    { a: 'a7', b: 'b7' },
-]
 
-const showButtom = () => {
-    const totalPage = data.length / length;
-    $("#data-show-buttom").innerHTML += '<button id="clcik-page-first">first</button>';
-    $("#data-show-buttom").innerHTML += '<button id="clcik-page-previous">previous</button>';
-    for (let i = 0; i < totalPage; i += 1) {
-        if (i < 6) {
-            $("#data-show-buttom").innerHTML += `<a id = "data-item-${i}">  ${i + 1}  </a>`;
+// eslint-disable-next-line func-names
+const Pagination = function (data, column, config) { return _Pagination(data, column, config); };
+
+const _Pagination = (allData, column, config) => {
+    const $ = selector => {
+        if (selector.indexOf('#') === 0) {
+            return document.querySelector(selector);
         }
-    }
-    $("#data-show-buttom").innerHTML += '<button id="clcik-page-next">next</button>';
-    $("#data-show-buttom").innerHTML += '<button id="clcik-page-end">end</button>';
-}
-const showContent = (start, end) => {
-    const content = data.slice(start, end)
+        return document.querySelectorAll(selector);
+    };
+    let filteredData = allData;
+    const dataNumPerPage = 3; // 每页的数据量
+    let totalData = filteredData.length; // 数据总量
+    let totalPage = Math.ceil(totalData / dataNumPerPage); // 总页数
+    let current = 0; // 当前页码  从0开始
 
-    // show data
-    content.forEach((item) => {
-        const element =
-            `<tr>
-            <td>${item.a}</td>
-            <td>${item.b}</td>
-        </tr>`
-        $('#data-show-body').innerHTML += element;
+    const configG = config || {
+        add: true, update: true, delete: true, search: true,
+    };
+    const updateButtomElement = configG.update ? ' <td><button>update</button></td>' : '';
+    const deleteCheckBox = configG.delete ? '<td><input type="checkbox"/></td>' : '';
+
+    const getTheadElement = () => {
+        let th = '';
+        column.forEach(ele => {
+            th += `<th>${ele}</th>`;
+        });
+        const thead = `<thead><tr>${th}</tr></thead>`;
+        return thead;
+    };
+
+    const getTbodyElement = (content, start) => {
+        // show data
+        let tbodyElement = '<tbody>';
+        content.forEach((item, index) => {
+            const seq = start + index + 1;
+            const element = `<tr>
+                <td>${seq}</td>
+                <td>${item.a}</td>
+                <td>${item.b}</td>
+                <td>${item.c}</td>      
+                ${updateButtomElement}
+                ${deleteCheckBox}
+            </tr>`;
+            tbodyElement += element;
+        });
+        tbodyElement += '</tbody>';
+        return tbodyElement;
+    };
+
+    const getTableElement = (start, end) => {
+        const content = filteredData.slice(start, end);
+
+        const tableElement = `<table border="1" cellspacing='0'>
+            ${getTheadElement()}
+            ${getTbodyElement(content, start)}
+            </table>`;
+        return tableElement;
+    };
+
+    const getButtomElement = () => {
+        // 跳转
+        let pageButtomElement = `总共${totalData}条数据 共${totalPage}页，第
+        <input type="number" min="1" step="1" max="${totalPage}" id="click-page-jump-value" value=${current + 1}>页
+            <button id="click-page-jump">Go</button>
+        `;
+        pageButtomElement += '<button id=click-page-first">first</button>'; // 第一页
+        pageButtomElement += '<button id="click-page-previous">previous</button>'; // 上一页
+        pageButtomElement += '<button id="click-page-next">next</button>'; // 下一页
+        pageButtomElement += '<button id="click-page-last">end</button>'; // 尾页
+
+        return pageButtomElement;
+    };
+
+    const showData = (start, end) => {
+        if (start < 0 || end > totalData) {
+            console.log('err start < 0 || end > totalData');
+        } else {
+            current = start / dataNumPerPage;
+            // empty GUI data
+            $('#pagination').innerHTML = '';
+            $('#pagination').innerHTML = getTableElement(start, end) + getButtomElement();
+        }
+    };
+    // 首页
+    const firstPage = () => {
+        showData(0, dataNumPerPage);
+    };
+    // 尾页
+    const lastPage = () => {
+        const start = (totalPage - 1) * dataNumPerPage;
+        showData(start, totalData);
+    };
+    // 下一页
+    const nextPage = () => {
+        if (current + 2 < totalPage) {
+            const start = (current + 1) * dataNumPerPage;
+            const end = start + dataNumPerPage;
+            showData(start, end);
+        } else {
+            lastPage();
+        }
+    };
+    // 上一页
+    const previousPage = () => {
+        if (current > 0) {
+            const start = (current - 1) * dataNumPerPage;
+            const end = start + dataNumPerPage;
+            showData(start, end);
+        } else {
+            firstPage();
+        }
+    };
+
+    // 跳到某页
+    const jump = page => {
+        if (parseInt(page, 10) === totalPage) {
+            lastPage();
+        } else if (page > 0) {
+            const start = (page - 1) * dataNumPerPage;
+            const end = (page - 1) * dataNumPerPage + dataNumPerPage;
+            showData(start, end);
+        }
+    };
+    // 搜索 consiction = {a:'1'}
+    const resetFilteredData = data => {
+        filteredData = data;
+        totalData = filteredData.length; // 数据总量
+        totalPage = Math.ceil(totalData / dataNumPerPage); // 总页数
+        firstPage();
+    };
+    document.addEventListener('click', e => {
+        switch (e.target.id) {
+        case 'click-page-first': {
+            firstPage();
+            break;
+        }
+        case 'click-page-last': {
+            lastPage();
+            break;
+        }
+        case 'click-page-next': {
+            nextPage();
+            break;
+        }
+        case 'click-page-previous': {
+            previousPage();
+            break;
+        }
+        case 'click-page-jump': {
+            const page = $('#click-page-jump-value').value;
+            jump(page);
+            break;
+        }
+        default: {
+            if (e.target.id.includes('data-item-')) {
+                const page = e.target.id.substr(-1, 1);
+                jump(page);
+            } else if (e.target.id.includes('click-search-')) {
+                search({ a: 'a1' });
+            }
+        }
+        }
     });
 
-}
-const showData = (start,end) => {
-    // empty GUI data
-    $("#data-show-buttom").innerHTML = '';
-    $("#data-show-head").innerHTML = '';
-    $('#data-show-body').innerHTML = '';
+    const api = {
+        filteredData,
+        dataNumPerPage,
 
-    showButtom();
-    showContent(start,end);
-}
-// 下一页
-const down = (data, start) => {
-
-}
-// 上一页
-const up = (data, start) => {
-
-}
-// 首页
-const firstPage = () => {
-    showData(0, length);
-}
-// 尾页
-const lastPage = (data, start) => {
-
-}
-// 跳到某页
-const jump = (page) => {
-    // showData(start,end)
-    showData(page * length, page * length + length);
-}
-document.addEventListener('click', e => {
-    switch (e.target.id) {
-    case 'clcik-page-first': {
-        getExpressionsByAPI();
-        break;
-    }
-    case 'clcik-page-last': {
-        getEntitiesByAPI();
-        break;
-    }
-    case 'clcik-page-next': {
-        getIntentByAPI();
-        break;
-    }
-    case 'clcik-page-previous': {
-        getIntentByAPI();
-        break;
-    }
-    default:{
-        if(e.target.id.includes('data-item-')){
-            const page = e.target.id.substr(-1,1);
-            jump(page);
-        }
-    }
-    }
-});
-firstPage(0);
+        firstPage,
+        lastPage,
+        nextPage,
+        previousPage,
+        resetFilteredData,
+    };
+    return api;
+};
